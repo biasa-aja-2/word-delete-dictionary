@@ -15,13 +15,28 @@ import sys
 
 WORD = "queue"
 
+# The gate (RULES.txt): /output/entry.txt must be UTF-8 text of 1 to 77
+# characters, not only white space. Fail loudly here rather than shipping
+# an entry the sealed scorer would refuse.
+MIN_LEN = 1
+MAX_LEN = 77
+
+
+def validate(word: str) -> str:
+    text = word.strip()
+    if not (MIN_LEN <= len(text) <= MAX_LEN):
+        raise ValueError(f"entry must be {MIN_LEN}-{MAX_LEN} chars, got {len(text)}")
+    if len(text.split()) != 1:
+        raise ValueError("entry must be exactly one word")
+    return text
+
 
 def main() -> int:
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(WORD + "\n")
+        f.write(validate(WORD) + "\n")
     return 0
 
 
